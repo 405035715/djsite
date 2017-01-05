@@ -30,8 +30,7 @@ def get_monitor_data(request):
     result_set = []
     jd_monitor_data = JdMonitor.objects.all()
     for data in jd_monitor_data:
-        result_set.append({'hospital_name': data.hospital_name, 'hospital_id': data.hospital_id,
-                           'last_update_datetime': data.last_update_datetime.strftime('%Y-%m-%d %H:%M:%S')})
+        result_set.append({'hospital_name': data.hospital_name, 'last_update_datetime': data.last_update_datetime.strftime('%Y-%m-%d %H:%M:%S')})
     return HttpResponse(response_help(APP_CODE, 'success', result_set))
 
 
@@ -43,9 +42,8 @@ def update_monitor_data(request):
     """
     req = getattr(request, request.method)
     param_hospital_name = req.get('hospital_name')
-    param_hospital_id = req.get('hospital_id')
     param_last_update_datetime = datetime.datetime.strptime(req.get('last_update_datetime'), '%Y-%m-%d-%H:%M:%S')
-    jd_monitor = JdMonitor(hospital_name=param_hospital_name, hospital_id=param_hospital_id,
+    jd_monitor = JdMonitor(hospital_name=param_hospital_name,
                            last_update_datetime=param_last_update_datetime)
     jd_monitor.save()
     return HttpResponse(response_help(APP_CODE, 'success'))
