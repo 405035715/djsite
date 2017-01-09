@@ -1,7 +1,12 @@
+# coding = utf-8
+
 from django.shortcuts import render, HttpResponse
 import json
+import urllib.request
+import urllib.parse
 # from .models import JdMonitor
-import datetime
+# import datetime
+import time
 
 APP_CODE = 1.0  # 版本号
 
@@ -20,32 +25,71 @@ def response_help(appcode, databuffer, result=None):
     json_str = json.dumps(json_dic, False)
     return json_str
 
-#
-# def get_monitor_data(request):
-#     """
-#     获取监控数据
-#     :param request:
-#     :return:
-#     """
-#     result_set = []
-#     jd_monitor_data = JdMonitor.objects.all()
-#     for data in jd_monitor_data:
-#         result_set.append({'hospital_name': data.hospital_name, 'hospital_id': data.hospital_id,
-#                            'last_update_datetime': data.last_update_datetime.strftime('%Y-%m-%d %H:%M:%S')})
-#     return HttpResponse(response_help(APP_CODE, 'success', result_set))
-#
-#
-# def update_monitor_data(request):
-#     """
-#     插入监控数据
-#     :param request:
-#     :return:
-#     """
-#     req = getattr(request, request.method)
-#     param_hospital_name = req.get('hospital_name')
-#     param_hospital_id = req.get('hospital_id')
-#     param_last_update_datetime = datetime.datetime.strptime(req.get('last_update_datetime'), '%Y-%m-%d-%H:%M:%S')
-#     jd_monitor = JdMonitor(hospital_name=param_hospital_name, hospital_id=param_hospital_id,
-#                            last_update_datetime=param_last_update_datetime)
-#     jd_monitor.save()
-#     return HttpResponse(response_help(APP_CODE, 'success'))
+
+def jdimage_login():
+    """
+    监测APP是否登录成功
+    连续3次测试登录不成功，判断为异常
+    登录不成功原因：1、账户不正确 2、服务器响应异常 返回：{'login': False, 'token': ''}
+    登录成功，返回：{'login': True, 'token': '')}
+    """
+    url = 'http://121.40.19.7/api/doctor/login'
+    values = {'username': '18072996469',
+              'password': '123456'
+              }
+    data = urllib.parse.urlencode(values)  # 编码工作
+    data = data.encode('utf-8')
+    user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'  # 模拟浏览器
+    headers = {'User-Agent': user_agent}
+    req = urllib.request.Request(url, data, headers)  # 发送请求同时传data表单
+    i = 0
+    while i < 3:  # 如果失败会尝试3次
+        try:
+            with urllib.request.urlopen(req) as response:  # 接受反馈的信息
+                the_page = response.read().decode('utf-8')  # 读取反馈的内容
+                result_json = json.loads(the_page)  # 解析json格式的str
+                # print(the_page)
+                if result_json['flag']:
+                    return {'login': True, 'token': result_json.get('user', {}).get('token', '')}  # 登录成功返回token
+                else:
+                    time.sleep(1)  # 失败后，1秒后再测试
+        except urllib.request.URLError as e:
+            time.sleep(1)  # 失败后，1秒后再测试
+            print(e)
+        finally:
+            i += 1
+    return {'login': False, 'token': ''}  # 登录失败返回False
+
+
+def jdimage_hospitals(token_str):
+    """
+    获取医院列表
+    """
+    url = 'http://121.40.19.7/api/real/info?token=%s' % token_str
+    req = urllib.request.Request(url)
+    try:
+        with urllib.request.urlopen(req) as response:
+            the_page = response.read().decode('utf-8')  # 读取反馈的内容
+            result_json = json.loads(the_page)  # 解析json格式的str
+            monitor_hospitals = []
+            for hospital in result_json['info']['linkHospitals']:
+                monitor_hospitals.append(hospital)
+                print(hospital)
+            return monitor_hospitals  # [{'name': '影像云诊断中心', 'pacs_hid': 'jdimage', 'id': 14},...]
+    except urllib.request.URLError as e:
+        print(e)
+    return [{'name': '', 'pacs_hid': '', 'id': 0}]
+
+
+def hospitals_from_jdimage(request):
+    """
+    获取jdimage中的医院
+    :param request:
+    :return:
+    """
+    hospitals_set = jdimage_hospitals(jdimage_login()['token'])
+    context = {
+        'hospitals_set': hospitals_set
+    }
+    return render(request, 'jdmonitor/jdimage_hospitals.html', context)
+
