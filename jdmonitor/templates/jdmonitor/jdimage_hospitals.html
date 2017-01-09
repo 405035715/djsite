@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="/static/report/css/patientlist.css" rel="stylesheet" type="text/css" />
+    <meta charset="UTF-8">
+    <title>医院列表</title>
+</head>
+<body>
+    <div id="container" style="width:1000px;margin: 0 auto;margin-top: 20px">
+        <div style="margin: auto; margin-top: 20px">
+            <table border="1" style="top: 20px;text-align: center;width: 1000px" >
+                <tr style="background-color: #00ad9c">
+                    <td>医院id</td></td><td>医院名词</td><td>医院pacs_key</td>
+                </tr>
+                {%  for hospital in  hospitals_set %}
+                     <tr>
+                          <td>{{ hospital.id }}</td>
+                          <td>{{ hospital.name }}</td>
+                          <td>{{ hospital.pacs_hid}}</td>
+                     </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+</body>
+</html>
