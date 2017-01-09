@@ -91,5 +91,5 @@ def hospitals_from_jdimage(request):
     context = {
         'hospitals_set': hospitals_set
     }
-    return render(request, 'jdmonitor/jdimage_hospitals.html', context)
+    return render(request, 'jdmonitor/jdimage_hospitals.html',  context)
 
