@@ -3,8 +3,22 @@
 from django.db import models
 import datetime
 
-class Hospital(models.Model):
 
+class MonitorTime(models.Model):
+    """
+    监控时间
+    """
+    def __str__(self):
+        return self.monitor_time
+
+    monitor_time = models.TimeField(verbose_name='监控时间')
+
+
+
+class Hospital(models.Model):
+    """
+    医院
+    """
     def __str__(self):
         return self.hospital_name
 
@@ -13,10 +27,13 @@ class Hospital(models.Model):
     hospital_pacs_hid = models.CharField(max_length=10, default='', verbose_name="医院的pacs_hid")
     last_update_datetime = models.DateTimeField(default=datetime.datetime.strptime(
         '1970-01-01 00:00:00', '%Y-%m-%d %H:%M:%S'), verbose_name='time of the last update data')
+    monitortimes = models.ManyToManyField(MonitorTime, verbose_name='监控时间')
 
 
 class Engineer(models.Model):
-
+    """
+    工程师
+    """
     def __str__(self):
         return self.engineer_name
 
@@ -24,3 +41,15 @@ class Engineer(models.Model):
     engineer_phone = models.CharField(max_length=11, verbose_name="工程师电话")
     engineer_email = models.CharField(max_length=40, verbose_name="工程师邮箱")
     hospitals = models.ManyToManyField(Hospital, verbose_name='负责的医院')
+
+
+
+
+class MonitorInterval(models.Model):
+    """
+    监控的间隔时间
+    """
+    def __str__(self):
+        return self.monitor_interval
+
+    monitor_interval = models.IntegerField(verbose_name='监控的间隔时间')

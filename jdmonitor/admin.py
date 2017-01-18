@@ -2,9 +2,14 @@ from django.contrib import admin
 from .models import *
 
 
+class MonitorTimeAdmin(admin.ModelAdmin):
+    list_display = ['monitor_time']
+    fieldsets = [(None, {'fields': ['monitor_time']})]
+
+
 class HospitalAdmin(admin.ModelAdmin):
     list_display = ['hospital_id', 'hospital_name', 'hospital_pacs_hid']
-    fieldsets = [(None, {'fields': ['hospital_id', 'hospital_name', 'hospital_pacs_hid']})]
+    fieldsets = [(None, {'fields': ['hospital_id', 'hospital_name', 'hospital_pacs_hid', 'monitortimes']})]
 
 
 # class HospitalInline(admin.StackedInline):
