@@ -22,5 +22,6 @@ class EngineerAdmin(admin.ModelAdmin):
     fieldsets = [(None, {'fields': ['engineer_name', 'engineer_phone', 'engineer_email', 'hospitals']})]
 
 
+admin.site.register(MonitorTime, MonitorTimeAdmin)
 admin.site.register(Hospital, HospitalAdmin)
 admin.site.register(Engineer, EngineerAdmin)
