@@ -52,7 +52,6 @@ class Engineer(models.Model):
 
 
 
-
 class MonitorInterval(models.Model):
     """
     监控的间隔时间(秒)
