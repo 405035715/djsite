@@ -1,12 +1,12 @@
 # coding = utf-8
 
 from django.shortcuts import render, HttpResponse
-import json
 import urllib.request
 import urllib.parse
-# from .models import JdMonitor
+from .models import *
 # import datetime
 import time
+import json
 
 APP_CODE = 1.0  # 版本号
 
@@ -93,3 +93,53 @@ def hospitals_from_jdimage(request):
     }
     return render(request, 'jdmonitor/jdimage_hospitals.html',  context)
 
+
+def all_monitor_time_api(request):
+    """
+    接口：返回所有的监控医院的时间s
+    :param request: hospital_id
+    :return:
+    """
+    rows = MonitorTime.objects.all()
+    monitor_times = []
+    for tmp in rows:
+        monitor_times.append({'monitor_time': tmp.monitor_time.strftime('%H:%M'), 'id': tmp.id})
+    return HttpResponse(json.dumps(monitor_times), content_type="application/json")
+
+
+def monitor_time_hospitals_api(request):
+    """
+     接口：监控时间对应的医院s
+    :param request: id : 监控时间的id
+    :return:
+    """
+    if request.GET['id']:
+        m = MonitorTime.objects.get(id=request.GET['id'])
+        rows = m.hospital_set.all()
+        hospitals = []
+        for row in rows:
+            hospital = {'hospital_name': row.hospital_name, 'hospital_id': row.hospital_id,
+                        'hospital_pacs_hid': row.hospital_pacs_hid}
+            hospitals.append(hospital)
+            # print(hospital)
+        return HttpResponse(json.dumps(hospitals), content_type="application/json")
+    return HttpResponse(json.dumps([]), content_type="application/json")
+
+
+def hospital_engineers_api(request):
+    """
+    接口：医院对应的工程师s
+    :param request: hospital_id :医院的id
+    :return:
+    """
+    if request.GET['hospital_id']:
+        h = Hospital.objects.get(hospital_id=10922)
+        # request.GET['hospital_id'])
+        rows = h.engineer_set.all()
+        engineers = []
+        for row in rows:
+            engineer = {'id': row.id, 'engineer_name': row.engineer_name, 'engineer_email': row.engineer_email,
+                        'engineer_phone': row.engineer_phone}
+            engineers.append(engineer)
+        return HttpResponse(json.dumps(engineers), content_type="application/json")
+    return HttpResponse(json.dumps([]), content_type="application/json")
