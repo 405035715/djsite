@@ -133,7 +133,7 @@ def hospital_engineers_api(request):
     :return:
     """
     if request.GET['hospital_id']:
-        h = Hospital.objects.get(hospital_id=10922)
+        h = Hospital.objects.get(hospital_id=request.GET['hospital_id'])
         # request.GET['hospital_id'])
         rows = h.engineer_set.all()
         engineers = []
