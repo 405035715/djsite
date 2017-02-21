@@ -132,14 +132,19 @@ def hospital_engineers_api(request):
     :param request: hospital_id :医院的id
     :return:
     """
-    if request.GET['hospital_id']:
+    engineers = []
+    if request.GET['hospital_id'] != '-1':
         h = Hospital.objects.get(hospital_id=request.GET['hospital_id'])
         # request.GET['hospital_id'])
         rows = h.engineer_set.all()
-        engineers = []
         for row in rows:
             engineer = {'id': row.id, 'engineer_name': row.engineer_name, 'engineer_email': row.engineer_email,
                         'engineer_phone': row.engineer_phone}
             engineers.append(engineer)
-        return HttpResponse(json.dumps(engineers), content_type="application/json")
-    return HttpResponse(json.dumps([]), content_type="application/json")
+    else:
+        rows = Engineer.objects.all()
+        for row in rows:
+            engineer = {'id': row.id, 'engineer_name': row.engineer_name, 'engineer_email': row.engineer_email,
+                        'engineer_phone': row.engineer_phone}
+            engineers.append(engineer)
+    return HttpResponse(json.dumps(engineers), content_type="application/json")
