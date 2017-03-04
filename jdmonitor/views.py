@@ -148,3 +148,23 @@ def hospital_engineers_api(request):
                         'engineer_phone': row.engineer_phone}
             engineers.append(engineer)
     return HttpResponse(json.dumps(engineers), content_type="application/json")
+
+
+def get_receiver_lasttime_mail_api(request):
+    """
+    接口：获得邮件的收件人的最晚的记录
+    :param request: mail_type
+    :return:
+    """
+
+
+def add_mail_record_api(request):
+    """
+    接口：插入一条邮件的发送记录
+    :param request: mail_receiver 邮件接受者
+    :param request: mail_datetime 邮件发送时间
+    :param request: mail_type 邮件类型：医院上传0；app监控：1
+    :param request: mail_content 邮件内容
+    :return:
+    """
+

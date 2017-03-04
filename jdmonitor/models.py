@@ -64,3 +64,16 @@ class MonitorInterval(models.Model):
 
     class Meta:
         verbose_name = '监控APP的间隔时间(秒)'
+
+
+class Mails(models.Model):
+    """
+    邮件发送记录
+    """
+    def __str__(self):
+        return self.mail_receiver
+
+    mail_receiver = models.CharField(max_length=30, verbose_name="邮件接收者")
+    mail_datetime = models.TimeField(verbose_name="邮件发送时间")
+    mail_type = models.IntegerField(max_length=4, verbose_name="邮件类型：医院上传0；app监控：1")
+    mail_content = models.CharField(max_length=300, verbose_name="邮件内容")
