@@ -8,14 +8,14 @@ class MonitorTimeAdmin(admin.ModelAdmin):
 
 
 class HospitalAdmin(admin.ModelAdmin):
-    list_display = ['hospital_id', 'hospital_name', 'hospital_pacs_hid']
-    fieldsets = [(None, {'fields': ['hospital_id', 'hospital_name', 'hospital_pacs_hid', 'monitortimes']})]
+    list_display = ['hospital_id', 'hospital_name', 'hospital_pacs_hid', 'exceptioninterval']
+    fieldsets = [(None, {'fields': ['hospital_id', 'hospital_name', 'hospital_pacs_hid', 'monitortimes', 'exceptioninterval']})]
 
 
-# class HospitalInline(admin.StackedInline):
-#     model = Hospital
-#     extra = 3
-#
+class ExceptionIntervalAdmin(admin.ModelAdmin):
+    list_display = ['exception_interval']
+    fieldsets = [(None, {'fields': ['exception_interval']})]
+
 
 class EngineerAdmin(admin.ModelAdmin):
     list_display = ['engineer_name', 'engineer_phone', 'engineer_email']
@@ -25,3 +25,4 @@ class EngineerAdmin(admin.ModelAdmin):
 admin.site.register(MonitorTime, MonitorTimeAdmin)
 admin.site.register(Hospital, HospitalAdmin)
 admin.site.register(Engineer, EngineerAdmin)
+admin.site.register(ExceptionInterval, ExceptionIntervalAdmin)

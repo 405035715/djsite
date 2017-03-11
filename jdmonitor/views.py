@@ -104,7 +104,7 @@ def all_monitor_time_api(request):
     monitor_times = []
     for tmp in rows:
         monitor_times.append({'monitor_time': tmp.monitor_time.strftime('%H:%M'), 'id': tmp.id})
-    return HttpResponse(json.dumps(monitor_times), content_type="application/json")
+    return HttpResponse(json.dumps(monitor_times), content_type="application/json", status=200)
 
 
 def monitor_time_hospitals_api(request):
@@ -114,15 +114,22 @@ def monitor_time_hospitals_api(request):
     :return:
     """
     if request.GET['id']:
-        m = MonitorTime.objects.get(id=request.GET['id'])
-        rows = m.hospital_set.all()
-        hospitals = []
-        for row in rows:
-            hospital = {'hospital_name': row.hospital_name, 'hospital_id': row.hospital_id,
-                        'hospital_pacs_hid': row.hospital_pacs_hid}
-            hospitals.append(hospital)
-            # print(hospital)
-        return HttpResponse(json.dumps(hospitals), content_type="application/json")
+        id = int(request.GET['id'])
+        rows_id = MonitorTime.objects.values('id').all()
+        ids = []
+        for row_id in rows_id:
+            ids.append(row_id['id'])
+        print(ids)
+        if id in ids:
+            m = MonitorTime.objects.get(id=id)
+            rows = m.hospital_set.all()
+            hospitals = []
+            for row in rows:
+                hospital = {'hospital_name': row.hospital_name, 'hospital_id': row.hospital_id,
+                            'hospital_pacs_hid': row.hospital_pacs_hid, 'exceptioninterval': str(row.exceptioninterval)}
+                hospitals.append(hospital)
+                # print(hospital)
+            return HttpResponse(json.dumps(hospitals), content_type="application/json", status=200)
     return HttpResponse(json.dumps([]), content_type="application/json")
 
 
@@ -156,6 +163,13 @@ def get_receiver_lasttime_mail_api(request):
     :param request: mail_type
     :return:
     """
+    if request.GET['mail_receiver']:
+        row = Mails.objects.filter(mail_receiver=request.GET['mail_receiver']).order_by('-mail_datetime')[0]
+
+        if row:
+            mail = {'mail_receiver': row.mail_receiver, 'mail_datetime': datetime.datetime.strftime(row.mail_datetime, '%Y-%m-%d %H:%M:%S'),
+                     'mail_type': str(row.mail_type), 'mail_content': row.mail_content}
+            return HttpResponse(json.dumps(mail), content_type="application/json", status=200)
 
 
 def add_mail_record_api(request):
@@ -167,4 +181,11 @@ def add_mail_record_api(request):
     :param request: mail_content 邮件内容
     :return:
     """
+    print(request.GET['mail_datetime'])
+    if request.GET['mail_receiver'] and request.GET['mail_datetime'] and request.GET['mail_datetime'] and request.GET['mail_content']:
+
+        mail = Mails(mail_receiver=request.GET['mail_receiver'], mail_datetime=datetime.datetime.strptime(request.GET['mail_datetime'], '%Y-%m-%d %H:%M:%S'),
+                     mail_type=int(request.GET['mail_type']), mail_content=request.GET['mail_content'])
+        mail.save()
+        return HttpResponse(json.dumps([]), content_type="application/json", status=200)
 

@@ -11,4 +11,5 @@ urlpatterns = [
     url(r'api/get_receiver_lasttime_mail', views.get_receiver_lasttime_mail_api, name='get_receiver_lasttime_mail_api'),
     url(r'api/add_mail_record', views.add_mail_record_api, name='add_mail_record_api'),
 
+
 ]

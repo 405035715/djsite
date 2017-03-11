@@ -18,6 +18,19 @@ class MonitorTime(models.Model):
         verbose_name = '监控医院数据的时间'
 
 
+class ExceptionInterval(models.Model):
+    """
+    医院在一定的时间内没有数据，即为上传影响异常
+    """
+    def __str__(self):
+        return str(self.exception_interval)
+
+    exception_interval = models.IntegerField(verbose_name='n时间内没有数据为异常', null=False, default=60*60)
+
+    class Meta:
+        verbose_name = '医院在一定的时间内没有数据，即为上传影响异常'
+
+
 class Hospital(models.Model):
     """
     医院
@@ -31,6 +44,7 @@ class Hospital(models.Model):
     last_update_datetime = models.DateTimeField(default=datetime.datetime.strptime(
         '1970-01-01 00:00:00', '%Y-%m-%d %H:%M:%S'), verbose_name='time of the last update data')
     monitortimes = models.ManyToManyField(MonitorTime, verbose_name='监控时间')
+    exceptioninterval = models.ForeignKey(ExceptionInterval, verbose_name='监控医院n秒内没有数据为异常')
 
     class Meta:
         verbose_name = '医院'
@@ -52,6 +66,18 @@ class Engineer(models.Model):
         verbose_name = '工程师'
 
 
+class Mails(models.Model):
+    """
+    邮件发送记录
+    """
+    def __str__(self):
+        return self.mail_receiver
+
+    mail_receiver = models.CharField(max_length=30, verbose_name="邮件接收者")
+    mail_datetime = models.DateTimeField(verbose_name="邮件发送时间")
+    mail_type = models.IntegerField(verbose_name="邮件类型：医院上传0；app监控：1")
+    mail_content = models.CharField(max_length=300, verbose_name="邮件内容")
+
 
 class MonitorInterval(models.Model):
     """
@@ -64,16 +90,3 @@ class MonitorInterval(models.Model):
 
     class Meta:
         verbose_name = '监控APP的间隔时间(秒)'
-
-
-class Mails(models.Model):
-    """
-    邮件发送记录
-    """
-    def __str__(self):
-        return self.mail_receiver
-
-    mail_receiver = models.CharField(max_length=30, verbose_name="邮件接收者")
-    mail_datetime = models.TimeField(verbose_name="邮件发送时间")
-    mail_type = models.IntegerField(max_length=4, verbose_name="邮件类型：医院上传0；app监控：1")
-    mail_content = models.CharField(max_length=300, verbose_name="邮件内容")
